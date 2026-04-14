@@ -39,4 +39,49 @@ class UserController extends Controller
             'user' => $user
         ]);
     }
+
+    public function index()
+    {
+        $users = \App\Models\User::with('roles.permissions')->get();
+
+        $data = $users->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+
+                'roles' => $user->roles->map(function ($role) {
+                    return [
+                        'id' => $role->id,
+                        'name' => $role->name,
+
+                        'permissions' => $role->permissions->pluck('name')
+                    ];
+                })
+            ];
+        });
+
+        return response()->json([
+            'users' => $data
+        ]);
+    }
+
+    public function show($id)
+    {
+        $user = \App\Models\User::with('roles.permissions')->findOrFail($id);
+
+        return response()->json([
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'roles' => $user->roles->map(function ($role) {
+                    return [
+                        'name' => $role->name,
+                        'permissions' => $role->permissions->pluck('name')
+                    ];
+                })
+            ]
+        ]);
+    }
 }
