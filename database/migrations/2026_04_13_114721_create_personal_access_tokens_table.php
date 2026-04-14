@@ -6,26 +6,39 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('personal_access_tokens', function (Blueprint $table) {
             $table->id();
+
+            // 🔗 POLYMORPHIC (User or future systems)
             $table->morphs('tokenable');
-            $table->text('name');
+
+            // 🧾 TOKEN INFO
+            $table->string('name');
+
             $table->string('token', 64)->unique();
+
+            // 🔐 PERMISSIONS
             $table->text('abilities')->nullable();
+
+            // 🌐 CLIENT INFO (IMPORTANT ERP SECURITY IMPROVEMENT)
+            $table->string('ip_address')->nullable();
+            $table->text('user_agent')->nullable();
+            $table->string('device_name')->nullable();
+
+            // 📅 TRACKING
             $table->timestamp('last_used_at')->nullable();
-            $table->timestamp('expires_at')->nullable()->index();
+            $table->timestamp('expires_at')->nullable();
+
+            // 🧠 TOKEN TYPE (OPTIONAL BUT USEFUL)
+            $table->string('type')->default('api');
+            // api / web / mobile / admin
+
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('personal_access_tokens');
