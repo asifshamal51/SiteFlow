@@ -17,6 +17,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 });
 
+
+// create user
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::post('/users', [UserController::class, 'store']);
+});
+
+Route::middleware(['auth:sanctum', 'permission:create-users'])->group(function () {
     Route::post('/users', [UserController::class, 'store']);
 });
