@@ -52,8 +52,22 @@ class AuthController extends Controller
     // 👤 PROFILE API
     public function profile(Request $request)
     {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Unauthenticated'
+            ], 401);
+        }
+
         return response()->json([
-            'user' => $request->user()
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'user_type' => $user->user_type,
+                'is_active' => $user->is_active,
+            ]
         ]);
     }
 
