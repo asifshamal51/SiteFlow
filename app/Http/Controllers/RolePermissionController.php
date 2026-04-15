@@ -22,4 +22,19 @@ class RolePermissionController extends Controller
             'message' => 'Permissions assigned to role successfully'
         ]);
     }
+
+    public function removePermission(Request $request, $roleId)
+    {
+        $request->validate([
+            'permission_id' => 'required|exists:permissions,id',
+        ]);
+
+        $role = Role::findOrFail($roleId);
+
+        $role->permissions()->detach($request->permission_id);
+
+        return response()->json([
+            'message' => 'Permission removed from role successfully'
+        ]);
+    }
 }
