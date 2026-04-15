@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/login', [AuthController::class, 'login']);
 
+// User Endpoints
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [AuthController::class, 'profile']);
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -38,6 +39,8 @@ Route::middleware(['auth:sanctum', 'permission:create-users'])->group(function (
 Route::get('/users/{id}/roles-permissions', [UserController::class, 'userRolePermission'])
     ->middleware(['auth:sanctum']);
 
+
+// Roles and Permissions Endpoints
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
 
     // Roles list
