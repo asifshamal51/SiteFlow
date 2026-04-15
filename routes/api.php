@@ -19,28 +19,37 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [AuthController::class, 'profile']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/users', [UserController::class, 'getAllUsers']);
+    Route::get('/users/{id}', [UserController::class, 'show']);
+    Route::delete('/users/{id}', [UserController::class, 'deleteUser']);
+    Route::get('/deleted-users', [UserController::class, 'deletedUsers']);
+    Route::post('/users/{id}/restore-user', [UserController::class, 'restoreUser']);
+    Route::post('/create-user', [UserController::class, 'createUser']);
+    Route::put('/users/{id}', [UserController::class, 'update']);
 });
 
 
-// create user
-Route::middleware(['auth:sanctum', 'admin'])->group(function () {
-    Route::post('/users', [UserController::class, 'store']);
-});
-
+// PERMISSION: CRATE-USER
 Route::middleware(['auth:sanctum', 'permission:create-users'])->group(function () {
-    Route::post('/users', [UserController::class, 'store']);
+    Route::post('/create-user', [UserController::class, 'createUser']);
 });
 
 
-
-Route::middleware(['auth:sanctum', 'admin'])->group(function () {
-    Route::get('/users-with-roles', [UserController::class, 'index']);
-});
-
-Route::get('/users/{id}/roles-permissions', [UserController::class, 'show'])
+Route::get('/users/{id}/roles-permissions', [UserController::class, 'userRolePermission'])
     ->middleware(['auth:sanctum']);
 
 Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+
+    // Roles list
+    Route::get('/roles', [RoleController::class, 'index']);
+
+    Route::get('/users-with-roles', [UserController::class, 'index']);
+
+    // Permissions list
+    Route::get('/permissions', [PermissionController::class, 'index']);
+
+    // BONUS: roles with permissions
+    Route::get('/roles-with-permissions', [RoleController::class, 'withPermissions']);
 
     Route::post('/users/{id}/assign-role', [UserRoleController::class, 'assignRole']);
 
@@ -49,17 +58,4 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::delete('/users/{id}/remove-role', [UserRoleController::class, 'removeRole']);
 
     Route::delete('/roles/{id}/remove-permission', [RolePermissionController::class, 'removePermission']);
-});
-
-
-Route::middleware(['auth:sanctum', 'admin'])->group(function () {
-
-    // Roles list
-    Route::get('/roles', [RoleController::class, 'index']);
-
-    // Permissions list
-    Route::get('/permissions', [PermissionController::class, 'index']);
-
-    // BONUS: roles with permissions
-    Route::get('/roles-with-permissions', [RoleController::class, 'withPermissions']);
 });
