@@ -23,6 +23,7 @@ class User extends Authenticatable
         'user_type',
         'is_active',
         'created_by',
+        'is_super_admin',
     ];
 
     /**
@@ -42,6 +43,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
+            'is_super_admin' => 'boolean',
         ];
     }
 
@@ -67,11 +69,28 @@ class User extends Authenticatable
 
     public function hasRole(string $role): bool
     {
+        if ($this->is_super_admin) {
+            return true;
+        }
+
         return $this->roles()->where('name', $role)->exists();
     }
 
+//    public function hasPermission(string $permission): bool
+//    {
+//        return $this->roles()
+//            ->whereHas('permissions', function ($q) use ($permission) {
+//                $q->where('name', $permission);
+//            })->exists();
+//    }
+
     public function hasPermission(string $permission): bool
     {
+        // 🔥 SUPER ADMIN BYPASS
+        if ($this->is_super_admin) {
+            return true;
+        }
+
         return $this->roles()
             ->whereHas('permissions', function ($q) use ($permission) {
                 $q->where('name', $permission);
