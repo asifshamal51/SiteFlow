@@ -13,8 +13,10 @@ use Illuminate\Support\Facades\Route;
 //    return $request->user();
 //})->middleware('auth:sanctum');
 
-
 Route::post('/login', [AuthController::class, 'login']);
+Route::middleware(['auth:sanctum', 'active'])->group(function () {
+    // protected routes from inactive users
+
 
 // User Endpoints
 Route::middleware('auth:sanctum')->group(function () {
@@ -27,6 +29,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/users/{id}/restore-user', [UserController::class, 'restoreUser']);
     Route::post('/create-user', [UserController::class, 'createUser']);
     Route::put('/users/{id}', [UserController::class, 'update']);
+    Route::patch('/users/{id}/toggle-status', [UserController::class, 'toggleStatus']);
 });
 
 
@@ -61,4 +64,7 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::delete('/users/{id}/remove-role', [UserRoleController::class, 'removeRole']);
 
     Route::delete('/roles/{id}/remove-permission', [RolePermissionController::class, 'removePermission']);
+
+});
+
 });

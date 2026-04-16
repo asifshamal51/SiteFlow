@@ -85,34 +85,29 @@ class UserController extends Controller
         ]);
     }
 
-    public function getAllUsers()
+
+    public function getAllUsers(Request $request)
     {
-        $users = User::with([
-            'roles:id,name',
-            'roles.permissions:id,name'
-        ])
-            ->select('id', 'name', 'email', 'is_active', 'is_super_admin')
-            ->get()
-            ->map(function ($user) {
-                return [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'is_active' => $user->is_active,
-                    'is_super_admin' => $user->is_super_admin,
+        $search = $request->query('search');
+        $perPage = $request->query('per_page', 10);
 
-                    'roles' => $user->roles->pluck('name'),
-
-                    'permissions' => $user->roles
-                        ->flatMap->permissions
-                        ->pluck('name')
-                        ->unique()
-                        ->values(),
-                ];
-            });
+        $users = User::with('roles')
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%$search%")
+                        ->orWhere('email', 'like', "%$search%");
+                });
+            })
+            ->select('id', 'name', 'email', 'is_active')
+            ->paginate($perPage);
 
         return response()->json([
-            'users' => $users
+            'users' => $users->items(),
+            'pagination' => [
+                'current_page' => $users->currentPage(),
+                'last_page' => $users->lastPage(),
+                'total' => $users->total(),
+            ]
         ]);
     }
 
@@ -243,6 +238,32 @@ class UserController extends Controller
             ->get();
         return response()->json([
             'deleted_users' => $users
+        ]);
+    }
+
+    public function toggleStatus($id)
+    {
+        $user = User::findOrFail($id);
+
+        // 🔥 Prevent self-deactivation (IMPORTANT SAFETY)
+        if (auth()->id() === $user->id) {
+            return response()->json([
+                'message' => 'You cannot deactivate your own account'
+            ], 403);
+        }
+
+        // 🔄 Toggle status
+        $user->is_active = !$user->is_active;
+        $user->save();
+
+        return response()->json([
+            'message' => $user->is_active
+                ? 'User activated successfully'
+                : 'User deactivated successfully',
+            'user' => [
+                'id' => $user->id,
+                'is_active' => $user->is_active
+            ]
         ]);
     }
 }
