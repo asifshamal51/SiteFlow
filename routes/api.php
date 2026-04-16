@@ -1,6 +1,8 @@
 <?php
 
 
+use App\Http\Controllers\CurrencyController;
+use App\Http\Controllers\ShareholderController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Api\AuthController;
@@ -140,6 +142,28 @@ Route::middleware(['auth:sanctum', 'active'])->group(function () {
 
         Route::delete('/projects/{id}', [ProjectController::class, 'destroy'])
             ->middleware('project.permission:delete-projects');
+    });
+
+
+    Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+
+        Route::get('/shareholders', [ShareholderController::class, 'index']);
+        Route::post('/shareholders', [ShareholderController::class, 'store']);
+        Route::get('/shareholders/{id}', [ShareholderController::class, 'show']);
+        Route::put('/shareholders/{id}', [ShareholderController::class, 'update']);
+        Route::delete('/shareholders/{id}', [ShareholderController::class, 'destroy']);
+
+    });
+
+    Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+
+        Route::get('/currencies', [CurrencyController::class, 'index']);
+        Route::post('/currencies', [CurrencyController::class, 'store']);
+        Route::get('/currencies/{id}', [CurrencyController::class, 'show']);
+        Route::put('/currencies/{id}', [CurrencyController::class, 'update']);
+        Route::delete('/currencies/{id}', [CurrencyController::class, 'destroy']);
+
+
     });
 
 });
