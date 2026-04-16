@@ -266,4 +266,40 @@ class UserController extends Controller
             ]
         ]);
     }
+
+    public function myPermissions(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json([
+                'message' => 'Unauthenticated'
+            ], 401);
+        }
+
+        // 🔥 SUPER ADMIN → ALL PERMISSIONS
+        if ($user->is_super_admin) {
+            return response()->json([
+                'roles' => ['super_admin'],
+                'permissions' => ['*'], // wildcard (frontend understands full access)
+            ]);
+        }
+
+        // 🔥 LOAD ROLES + PERMISSIONS
+        $roles = $user->roles()->pluck('name');
+
+        $permissions = $user->roles()
+            ->with('permissions:id,name')
+            ->get()
+            ->pluck('permissions')
+            ->flatten()
+            ->pluck('name')
+            ->unique()
+            ->values();
+
+        return response()->json([
+            'roles' => $roles,
+            'permissions' => $permissions,
+        ]);
+    }
 }

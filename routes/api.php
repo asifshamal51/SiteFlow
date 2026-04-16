@@ -17,19 +17,23 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware(['auth:sanctum', 'active'])->group(function () {
     // protected routes from inactive users
 
+    Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+        Route::get('/users', [UserController::class, 'getAllUsers']);
+        Route::delete('/users/{id}', [UserController::class, 'deleteUser']);
+        Route::get('/deleted-users', [UserController::class, 'deletedUsers']);
+        Route::post('/users/{id}/restore-user', [UserController::class, 'restoreUser']);
+        Route::patch('/users/{id}/toggle-status', [UserController::class, 'toggleStatus']);
+        Route::post('/create-user', [UserController::class, 'createUser']);
+        Route::get('/users/{id}', [UserController::class, 'show']);
+
+    });
 
 // User Endpoints
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [AuthController::class, 'profile']);
     Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/users', [UserController::class, 'getAllUsers']);
-    Route::get('/users/{id}', [UserController::class, 'show']);
-    Route::delete('/users/{id}', [UserController::class, 'deleteUser']);
-    Route::get('/deleted-users', [UserController::class, 'deletedUsers']);
-    Route::post('/users/{id}/restore-user', [UserController::class, 'restoreUser']);
-    Route::post('/create-user', [UserController::class, 'createUser']);
     Route::put('/users/{id}', [UserController::class, 'update']);
-    Route::patch('/users/{id}/toggle-status', [UserController::class, 'toggleStatus']);
+    Route::get('/me/permissions', [UserController::class, 'myPermissions']);
 });
 
 
