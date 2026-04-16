@@ -62,10 +62,18 @@ class User extends Authenticatable
             ->withPivot('project_id', 'is_active');
     }
 
-    // 🔗 PROJECTS (future integration)
     public function projects()
     {
-        return $this->belongsToMany(Project::class, 'project_users');
+        return $this->belongsToMany(Project::class, 'project_users')
+            ->withPivot('role_id', 'assigned_by', 'is_active')
+            ->withTimestamps();
+    }
+
+    public function projectRoles($projectId)
+    {
+        return $this->belongsToMany(Role::class, 'project_users')
+            ->withPivot('project_id', 'is_active')
+            ->wherePivot('project_id', $projectId);
     }
 
     public function hasRole(string $role): bool
@@ -96,5 +104,30 @@ class User extends Authenticatable
             ->whereHas('permissions', function ($q) use ($permission) {
                 $q->where('name', $permission);
             })->exists();
+    }
+
+    public function hasProjectPermission(string $permission, int $projectId): bool
+    {
+        if ($this->is_super_admin) {
+            return true;
+        }
+
+        // 1. Get role(s) assigned to user in THIS project
+        $roleIds = \DB::table('project_users')
+            ->where('user_id', $this->id)
+            ->where('project_id', $projectId)
+            ->where('is_active', 1)
+            ->pluck('role_id');
+
+        if ($roleIds->isEmpty()) {
+            return false;
+        }
+
+        // 2. Check permissions via role_permissions
+        return \DB::table('role_permissions')
+            ->join('permissions', 'permissions.id', '=', 'role_permissions.permission_id')
+            ->whereIn('role_permissions.role_id', $roleIds)
+            ->where('permissions.name', $permission)
+            ->exists();
     }
 }

@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'permission' => \App\Http\Middleware\HasPermission::class,
             'active' => \App\Http\Middleware\CheckActiveUser::class,
+            'project.permission' => \App\Http\Middleware\ProjectPermissionMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

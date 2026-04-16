@@ -50,6 +50,7 @@ return new class extends Migration
                 ->nullOnDelete();
 
             $table->timestamps();
+
         });
     }
 
