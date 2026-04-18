@@ -29,8 +29,8 @@ return new class extends Migration
             $table->decimal('exchange_rate', 15, 6)->nullable();
             $table->decimal('amount_base', 15, 2)->nullable();
 
-            // 📘 BOOK SYSTEM
-            $table->foreignId('book_page_id')->nullable()->constrained();
+            // 📘 SIMPLE BOOK PAGE NUMBER
+            $table->integer('book_page_no')->nullable();
 
             // 📅 DATES
             $table->date('date');

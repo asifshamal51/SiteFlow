@@ -11,44 +11,35 @@ return new class extends Migration
         Schema::create('worker_payments', function (Blueprint $table) {
             $table->id();
 
-            // 👷 RELATIONS
             $table->foreignId('worker_id')->constrained();
             $table->foreignId('project_id')->constrained();
-            $table->foreignId('shareholder_id')->nullable()->constrained();
 
-            // 🧠 PAYMENT CLASSIFICATION
-            $table->string('role')->nullable();
+            // ⭐ IMPORTANT: SHAREHOLDER LINK
+            $table->foreignId('shareholder_id')->constrained();
+
+            // payment classification
+            $table->string('worker_type')->nullable();
+            // daily / contract / office
+
             $table->string('payment_type')->nullable();
             // salary / advance / bonus / deduction
 
-            // 💳 PAYMENT METHOD (NEW)
-            $table->string('payment_method')->nullable();
-            // cash / bank / mobile / in-kind
-
-            // 💰 FINANCIAL DATA
             $table->decimal('amount_original', 15, 2);
             $table->foreignId('currency_id')->constrained();
-            $table->decimal('exchange_rate', 15, 6);
+            $table->decimal('exchange_rate', 15, 6)->default(1);
             $table->decimal('amount_base', 15, 2);
 
-            // 📅 DATE SYSTEM
+            // BOOK PAGE
+            $table->integer('book_page_no')->nullable();
+
             $table->date('date');
             $table->string('date_shamsi')->nullable();
 
-            // 🧠 CONTROL (NEW)
-            $table->string('status')->default('paid');
-            // paid / pending / approved / rejected
+            $table->string('payment_method')->nullable();
 
-            // 👤 AUDIT
-            $table->foreignId('created_by')
-                ->nullable()
-                ->constrained('users');
-
-            // 📘 BOOK SYSTEM
-            $table->foreignId('book_page_id')->nullable()->constrained();
-
-            // 🧠 DESCRIPTION
             $table->text('description')->nullable();
+
+            $table->foreignId('created_by')->nullable()->constrained('users');
 
             $table->timestamps();
         });

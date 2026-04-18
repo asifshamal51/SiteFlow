@@ -17,6 +17,8 @@ return new class extends Migration
             // 📦 CLASSIFICATION
             $table->foreignId('category_id')->constrained();
 
+            $table->foreignId('shareholder_id')->constrained();
+
             // 💰 FINANCIAL CORE
             $table->decimal('amount_original', 15, 2);
             $table->foreignId('currency_id')->constrained();
@@ -36,10 +38,8 @@ return new class extends Migration
                 ->nullable()
                 ->constrained('users');
 
-            // 📘 KHAATA SYSTEM
-            $table->foreignId('book_page_id')
-                ->nullable()
-                ->constrained();
+            // 📘 SIMPLE BOOK PAGE NUMBER
+            $table->integer('book_page_no')->nullable();
 
             // 🧠 DESCRIPTION
             $table->text('description')->nullable();

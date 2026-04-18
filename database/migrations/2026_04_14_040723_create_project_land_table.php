@@ -11,32 +11,43 @@ return new class extends Migration
         Schema::create('project_land', function (Blueprint $table) {
             $table->id();
 
-            // 🏗️ PROJECT LINK
-            $table->foreignId('project_id')->constrained()->cascadeOnDelete();
+            // 🏗️ PROJECT IT BELONGS TO
+            $table->foreignId('project_id')
+                ->constrained()
+                ->cascadeOnDelete();
 
-            // 📍 LAND DETAILS
+            // 👤 SHAREHOLDER WHO PAID
+            $table->foreignId('shareholder_id')
+                ->constrained()
+                ->restrictOnDelete();
+
+            // 🌍 LAND DETAILS
+            $table->string('name'); // e.g. "Kabul Plot A"
             $table->text('description')->nullable();
 
-            $table->decimal('area', 15, 2)->nullable();
-            $table->string('area_unit')->nullable();
-            // sqm, jerib, etc.
+            // 💰 PURCHASE AMOUNT (SIMPLE)
+            $table->decimal('purchase_amount', 18, 2);
 
-            // 💰 FINANCIAL VALUE
-            $table->decimal('purchase_price', 18, 2)->nullable();
-            $table->foreignId('currency_id')->nullable()->constrained();
-            $table->decimal('exchange_rate', 15, 6)->nullable();
-            $table->decimal('price_base', 18, 2)->nullable();
+            $table->foreignId('currency_id')
+                ->constrained()
+                ->restrictOnDelete();
 
-            // 📅 DATE
+            $table->decimal('exchange_rate', 15, 6)->default(1);
+            $table->decimal('amount_base', 18, 2);
+
+            // 📘 SIMPLE BOOK PAGE NUMBER
+            $table->integer('book_page_no')->nullable();
+
+            // 📝 OPTIONAL NOTES
+            $table->text('note')->nullable();
+
+            // 📅 PURCHASE DATE
             $table->date('purchase_date')->nullable();
             $table->string('date_shamsi')->nullable();
 
-            // 🧠 STATUS CONTROL
+            // ⚙️ STATUS
             $table->string('status')->default('owned');
-            // owned / pending / sold / reserved
-
-            // 💡 COST CONTROL
-            $table->boolean('include_in_project_cost')->default(false);
+            // owned / sold / reserved
 
             $table->timestamps();
         });

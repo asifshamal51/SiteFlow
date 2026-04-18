@@ -31,10 +31,8 @@ return new class extends Migration
             // 📦 UNIT (OPTIONAL BUT USEFUL)
             $table->string('unit')->nullable();
 
-            // 📘 KHAATA SYSTEM
-            $table->foreignId('book_page_id')
-                ->nullable()
-                ->constrained();
+            // 📘 SIMPLE BOOK PAGE NUMBER
+            $table->integer('book_page_no')->nullable();
 
             // 🏗️ PROJECT LINK
             $table->foreignId('project_id')
